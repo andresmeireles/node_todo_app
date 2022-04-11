@@ -14,27 +14,57 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const Task_1 = __importDefault(require("../models/Task"));
 class TasksController {
+    constructor() {
+        this.getTask = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { params: { id: taskID }, } = req;
+            const task = yield this.findTaskById(taskID);
+            return res.json({ task });
+        });
+        this.updateTask = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { body, params: { id: taskID }, } = req;
+            const task = yield this.findTaskById(taskID);
+            const newTask = yield task.updateOne(body, {
+                new: true,
+                runValidators: true,
+            });
+            return res.json({ newTask });
+        });
+    }
     getAllTasks(req, res) {
-        return res.send('olá mundo');
-    }
-    getTask(req, res) {
-        const { id } = req.params;
-        return res.send(id);
-    }
-    updateTask(req, res) {
-        const { id } = req.params;
-        return res.send(id);
+        return __awaiter(this, void 0, void 0, function* () {
+            const tasks = yield Task_1.default.find();
+            return res.json({ tasks });
+        });
     }
     createTask(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { body } = req;
-            Task_1.default.create(body);
-            return res.json(body);
+            try {
+                const { body } = req;
+                const task = yield Task_1.default.create(body);
+                return res.status(200).json(task);
+            }
+            catch (error) {
+                const err = error;
+                return res.send(err.message);
+            }
         });
     }
     deleteTask(req, res) {
-        const { id } = req.params;
-        return res.send(id);
+        return __awaiter(this, void 0, void 0, function* () {
+            const { params: { id }, } = req;
+            const task = yield this.findTaskById(id);
+            const removedTask = yield task.delete();
+            return res.json({ removedTask });
+        });
+    }
+    findTaskById(taskId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const task = yield Task_1.default.findOne({ _id: taskId });
+            if (!task) {
+                throw new Error(`task not found with id: ${taskId}`);
+            }
+            return task;
+        });
     }
 }
 exports.default = TasksController;

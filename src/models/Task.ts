@@ -6,8 +6,11 @@ export interface Task {
 }
 
 const taskSchema = new Schema<Task>({
-  name: String,
-  completed: Boolean,
+  name: { type: String, required: [true, 'name must be provided!'], trim: true, maxlength: [20, 'cannot be more tha 20'] },
+  completed: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 export default model('Task', taskSchema);
