@@ -7,6 +7,8 @@ const express_1 = require("express");
 const homeController_1 = __importDefault(require("../src/controller/homeController"));
 const router = (0, express_1.Router)();
 const controller = new homeController_1.default();
-router.get('/', controller.index);
+router.route('/tasks')
+    .get(controller.index);
+// .post()
 exports.default = router;
 //# sourceMappingURL=home.js.map
