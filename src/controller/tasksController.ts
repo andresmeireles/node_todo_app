@@ -1,13 +1,15 @@
 import { Request, Response } from 'express';
 import TaskModel, { Task } from '../models/Task';
 import { Document } from 'mongoose';
+import MongoDBOperationError from '../exceptions/MongoDBOperationError';
 
+// TODO: add a class with private method
 export default class TasksController {
-  public async getAllTasks(req: Request, res: Response): Promise<Response> {
+  public getAllTasks = async (req: Request, res: Response) => {
     const tasks = await TaskModel.find();
 
     return res.json({ tasks });
-  }
+  };
 
   getTask = async (req: Request, res: Response) => {
     const {
@@ -18,7 +20,7 @@ export default class TasksController {
     return res.json({ task });
   };
 
-  updateTask = async (req: Request, res: Response): Promise<Response> => {
+  updateTask = async (req: Request, res: Response) => {
     const {
       body,
       params: { id: taskID },
@@ -32,16 +34,11 @@ export default class TasksController {
     return res.json({ newTask });
   };
 
-  public async createTask(req: Request, res: Response) {
-    try {
-      const { body } = req;
-      const task = await TaskModel.create(body);
-      return res.status(200).json(task);
-    } catch (error) {
-      const err = error as Error;
-      return res.send(err.message);
-    }
-  }
+  public createTask = async (req: Request, res: Response) => {
+    const { body } = req;
+    const task = await TaskModel.create(body);
+    return res.status(200).json(task);
+  };
 
   public async deleteTask(req: Request, res: Response) {
     const {
@@ -56,7 +53,7 @@ export default class TasksController {
   private async findTaskById(taskId: string): Promise<Document<unknown, any, Task>> {
     const task = await TaskModel.findOne({ _id: taskId });
     if (!task) {
-      throw new Error(`task not found with id: ${taskId}`);
+      throw new MongoDBOperationError(`task not found with id: ${taskId}`);
     }
 
     return task;

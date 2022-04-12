@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import tasksRoutes from './routes/tasks';
 import connectDB from './src/db/connection';
@@ -17,6 +17,10 @@ app.get('/', (req, res) => res.end());
 
 // routes
 app.use('/api/v1/tasks', tasksRoutes);
+
+app.use((req, res) => res.status(404).send('not found'));
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => res.send('deu ruim'));
 
 const start = async () => {
   try {

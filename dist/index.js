@@ -24,6 +24,8 @@ app.use(express_1.default.json());
 app.get('/', (req, res) => res.end());
 // routes
 app.use('/api/v1/tasks', tasks_1.default);
+app.use((req, res) => res.status(404).send('not found'));
+app.use((err, req, res, next) => res.send('deu ruim'));
 const start = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!process.env.MONGODB_URI) {

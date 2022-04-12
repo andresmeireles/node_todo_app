@@ -13,8 +13,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const Task_1 = __importDefault(require("../models/Task"));
+const MongoDBOperationError_1 = __importDefault(require("../exceptions/MongoDBOperationError"));
+// TODO: add a class with private method
 class TasksController {
     constructor() {
+        this.getAllTasks = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const tasks = yield Task_1.default.find();
+            return res.json({ tasks });
+        });
         this.getTask = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { params: { id: taskID }, } = req;
             const task = yield this.findTaskById(taskID);
@@ -29,24 +35,10 @@ class TasksController {
             });
             return res.json({ newTask });
         });
-    }
-    getAllTasks(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const tasks = yield Task_1.default.find();
-            return res.json({ tasks });
-        });
-    }
-    createTask(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { body } = req;
-                const task = yield Task_1.default.create(body);
-                return res.status(200).json(task);
-            }
-            catch (error) {
-                const err = error;
-                return res.send(err.message);
-            }
+        this.createTask = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { body } = req;
+            const task = yield Task_1.default.create(body);
+            return res.status(200).json(task);
         });
     }
     deleteTask(req, res) {
@@ -61,7 +53,7 @@ class TasksController {
         return __awaiter(this, void 0, void 0, function* () {
             const task = yield Task_1.default.findOne({ _id: taskId });
             if (!task) {
-                throw new Error(`task not found with id: ${taskId}`);
+                throw new MongoDBOperationError_1.default(`task not found with id: ${taskId}`);
             }
             return task;
         });
